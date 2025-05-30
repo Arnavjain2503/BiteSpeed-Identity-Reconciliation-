@@ -6,7 +6,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  // Change provider to postgresql to match your DATABASE_URL
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -26,8 +27,7 @@ model Contact {
   deletedAt      DateTime?      // For potential soft deletes
 
   // Define self-relation for linkedId
-  // Note: Prisma uses relation fields for connections, not direct FK constraints in SQLite
-  primaryContact   Contact?       @relation("PrimarySecondary", fields: [linkedId], references: [id])
+  primaryContact   Contact?       @relation("PrimarySecondary", fields: [linkedId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   secondaryContacts Contact[]      @relation("PrimarySecondary")
 
   @@index([email])
