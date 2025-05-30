@@ -1,0 +1,37 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum LinkPrecedence {
+  primary
+  secondary
+}
+
+model Contact {
+  id             Int            @id @default(autoincrement())
+  phoneNumber    String?
+  email          String?
+  linkedId       Int?           // References another Contact's id
+  linkPrecedence LinkPrecedence
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  deletedAt      DateTime?      // For potential soft deletes
+
+  // Define self-relation for linkedId
+  // Note: Prisma uses relation fields for connections, not direct FK constraints in SQLite
+  primaryContact   Contact?       @relation("PrimarySecondary", fields: [linkedId], references: [id])
+  secondaryContacts Contact[]      @relation("PrimarySecondary")
+
+  @@index([email])
+  @@index([phoneNumber])
+  @@index([linkedId])
+}
+
